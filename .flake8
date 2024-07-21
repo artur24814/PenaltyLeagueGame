@@ -1,0 +1,8 @@
+[flake8]
+exclude =
+    __pycache__
+    env
+    .env
+    test.py
+
+max-line-length = 200
