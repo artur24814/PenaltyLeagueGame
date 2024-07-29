@@ -26,6 +26,12 @@ class FootballClub:
     def __eq__(self, other):
         return self.title == other.title
 
+    def __ne__(self, other):
+        return self.title != other.title
+
+    def __hash__(self):
+        return hash((self.title, ))
+
     @property
     def id(self):
         return self._id
@@ -97,6 +103,9 @@ class Season:
         self.index += 1
         return result
 
+    def __len__(self):
+        return len(self.match_weeks)
+
 
 class MatchWeek:
     def __init__(self, number, end=False):
@@ -134,7 +143,10 @@ class Match:
         return f'{self.club_home} vs. {self.club_away}'
 
     def __eq__(self, other):
-        return self.club_home == other.club_home and self.club_away == other.club_away
+        return hash(frozenset(self.__dict__.items()))
+
+    def __ne__(self, other):
+        return self.club_home != other.club_home or self.club_away != other.club_away
 
     @property
     def id(self):
