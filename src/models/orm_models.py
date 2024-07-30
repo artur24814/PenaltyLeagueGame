@@ -1,3 +1,6 @@
+from .orm_fields import IntergerField, RealField, TextField
+
+
 class BaseManager:
     def __init__(self, object, cursor=None):
         self.object = object
@@ -100,3 +103,22 @@ class Model:
     @property
     def id(self):
         return self._id
+
+    @id.setter
+    def id(self, value):
+        self._id = value
+
+    def get_init_sql(self):
+        fields_sql = ''
+        for field in self.db_fields_to_lookup:
+            if field == '_id':
+                continue
+            value = getattr(self, field)
+            if isinstance(value, int):
+                fields_sql += IntergerField(name=field, null=False).get_sql() + ', '
+            elif isinstance(value, float):
+                fields_sql += RealField(name=field, null=False).get_sql() + ', '
+            else:
+                fields_sql += TextField(name=field).get_sql() + ', '
+
+        return f"CREATE TABLE {self.manager.get_table_name()} ( _id INTEGER NOT NULL, " + fields_sql + "PRIMARY KEY (_id))"

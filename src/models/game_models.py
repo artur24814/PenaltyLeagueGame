@@ -1,11 +1,14 @@
 import random
 
+from .orm_models import Model
 
-class FootballClub:
+
+class FootballClub(Model):
+    db_fields_to_lookup = ['_id', 'title', 'potential', 'logo', 'points', 'mood', 'games', 'wins', 'draws', 'losses']
     accident_events = [-15, -13, -11, -9, -7, -5, -3, -1, 0, 1, 3, 5, 7, 9, 11, 13, 15]
 
     def __init__(self, title, potential, logo=None, points=0, mood=5):
-        self._id = -1
+        super().__init__()
         self.title = title
         self.potential = potential
         self.logo = logo
@@ -19,26 +22,6 @@ class FootballClub:
         self.wins = 0
         self.draws = 0
         self.losses = 0
-
-    def __str__(self) -> str:
-        return f'{self.title} - {self.potential}'
-
-    def __eq__(self, other):
-        return self.title == other.title
-
-    def __ne__(self, other):
-        return self.title != other.title
-
-    def __hash__(self):
-        return hash((self.title, ))
-
-    @property
-    def id(self):
-        return self._id
-
-    @id.setter
-    def id(self, value):
-        self._id = value
 
     def get_shape(self):
         return self.potential + self.mood + random.choice(self.accident_events)
@@ -80,6 +63,18 @@ class FootballClub:
 
     def _is_above_normal_mood_but_the_match_result_negative(self, value):
         return self.mood >= self.max_mood and value < 0
+
+    def __str__(self) -> str:
+        return f'{self.title} - {self.potential}'
+
+    def __eq__(self, other):
+        return self.title == other.title
+
+    def __ne__(self, other):
+        return self.title != other.title
+
+    def __hash__(self):
+        return hash((self.title, ))
 
 
 class Season:
@@ -139,15 +134,6 @@ class Match:
         self.matchWeek = week
         self.played = played
 
-    def __str__(self) -> str:
-        return f'{self.club_home} vs. {self.club_away}'
-
-    def __eq__(self, other):
-        return hash(frozenset(self.__dict__.items()))
-
-    def __ne__(self, other):
-        return self.club_home != other.club_home or self.club_away != other.club_away
-
     @property
     def id(self):
         return self._id
@@ -165,3 +151,12 @@ class Match:
         shape_home = self.club_home.get_shape()
         shape_away = self.club_away.get_shape()
         return 3, 0 if shape_home > shape_away else (0, 3 if shape_home > shape_away else 1, 1)
+
+    def __str__(self) -> str:
+        return f'{self.club_home} vs. {self.club_away}'
+
+    def __eq__(self, other):
+        return hash(frozenset(self.__dict__.items()))
+
+    def __ne__(self, other):
+        return self.club_home != other.club_home or self.club_away != other.club_away
