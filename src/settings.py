@@ -1,5 +1,7 @@
 import os
+import sys
 import pathlib
+sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
 TESTING = False
 BASE_DIR = pathlib.Path(__file__).resolve().parent

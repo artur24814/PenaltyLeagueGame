@@ -1,13 +1,12 @@
 import random
 
-from .orm_models import Model
+from src.models.orm_models import Model
 
 
 class FootballClub(Model):
-    db_fields_to_lookup = ['_id', 'title', 'potential', 'logo', 'points', 'mood', 'games', 'wins', 'draws', 'losses']
     accident_events = [-15, -13, -11, -9, -7, -5, -3, -1, 0, 1, 3, 5, 7, 9, 11, 13, 15]
 
-    def __init__(self, title, potential, logo=None, points=0, mood=5):
+    def __init__(self, title=None, potential=None, logo=None, points=0, mood=5):
         super().__init__()
         self.title = title
         self.potential = potential
@@ -15,13 +14,18 @@ class FootballClub(Model):
         self.points = points
         self.mood = mood
 
-        self.min_mood = 5
-        self.max_mood = 20
-
         self.games = 0
         self.wins = 0
         self.draws = 0
         self.losses = 0
+
+    @property
+    def min_mood(self):
+        return 5
+
+    @property
+    def max_mood(self):
+        return 20
 
     def get_shape(self):
         return self.potential + self.mood + random.choice(self.accident_events)

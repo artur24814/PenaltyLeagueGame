@@ -6,17 +6,17 @@ from src.settings import TESTING
 
 def create_connect():
     if TESTING:
-        return create_temp_db()
-    return create_prod_db()
+        return _create_temp_db()
+    return _create_prod_db()
 
 
-def create_prod_db():
+def _create_prod_db():
     cnx = sqlite3.connect('database.db')
     cursor = cnx.cursor()
     return cursor, cnx
 
 
-def create_temp_db():
+def _create_temp_db():
     _, db_path = tempfile.mkstemp()
     cnx = sqlite3.connect(db_path)
     cursor = cnx.cursor()

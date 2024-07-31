@@ -94,7 +94,7 @@ class BaseManager:
 
 
 class Model:
-    db_fields_to_lookup = ['_id']
+    fields_to_db_ignore = ['manager']
 
     def __init__(self):
         self._id = -1
@@ -107,6 +107,10 @@ class Model:
     @id.setter
     def id(self, value):
         self._id = value
+
+    @property
+    def db_fields_to_lookup(self):
+        return [attr for attr in self.__dict__.keys() if attr not in self.fields_to_db_ignore]
 
     def get_init_sql(self):
         fields_sql = ''
