@@ -11,18 +11,38 @@ def get_teams_config(path=TEAMS_CONFIG_FILE_DIR):
 
 def get_teams():
     team_config = get_teams_config()
-
-    if (len(team_config) % 2) != 0:
-        raise ValueError('There should be an even number of teams')
+    validate_team_config(team_config)
 
     teams = []
 
     id_indx = 1
     for team_name, values in team_config.items():
         new_club = FootballClub(team_name, values.get('potential'), values.get('logo'))
-        print(new_club)
         new_club.id = id_indx
         id_indx += 1
         teams.append(new_club)
 
     return teams
+
+
+def get_or_create_teams():
+    team_config = get_teams_config()
+    validate_team_config(team_config)
+
+    teams = []
+    result = FootballClub.manager.all().execute()
+
+    if result == []:
+        for team_name, values in team_config.items():
+            new_team = FootballClub(team_name, values.get('potential'), values.get('logo'))
+            new_team._id = new_team.create().execute()
+            teams.append(new_team)
+    else:
+        teams = [team for team in result]
+
+    return teams
+
+
+def validate_team_config(team_config):
+    if (len(team_config) % 2) != 0:
+        raise ValueError('There should be an even number of teams')

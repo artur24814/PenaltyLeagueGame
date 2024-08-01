@@ -5,8 +5,9 @@ from src.models.orm_models import Model
 
 class FootballClub(Model):
     accident_events = [-15, -13, -11, -9, -7, -5, -3, -1, 0, 1, 3, 5, 7, 9, 11, 13, 15]
+    db_fields_to_lookup = ['_id', 'title', 'potential', 'logo', 'points', 'mood', 'games', 'wins', 'draws', 'losses']
 
-    def __init__(self, title=None, potential=None, logo=None, points=0, mood=5):
+    def __init__(self, title=None, potential=None, logo=None, points=0, mood=5, games=0, wins=0, draws=0, losses=0):
         super().__init__()
         self.title = title
         self.potential = potential
@@ -14,10 +15,10 @@ class FootballClub(Model):
         self.points = points
         self.mood = mood
 
-        self.games = 0
-        self.wins = 0
-        self.draws = 0
-        self.losses = 0
+        self.games = games
+        self.wins = wins
+        self.draws = draws
+        self.losses = losses
 
     @property
     def min_mood(self):
@@ -40,11 +41,12 @@ class FootballClub(Model):
 
     def _set_stats(self, points):
         if points == 3:
-            self.win += 1
+            self.wins += 1
         elif points == 0:
-            self.lose += 1
+            self.losses += 1
         else:
-            self.draw += 1
+            self.draws += 1
+        return
 
     def _set_mood(self, value):
         if self._is_between_normal_mood():
@@ -142,14 +144,14 @@ class Match:
     def id(self):
         return self._id
 
-    def set_match_as_played(self):
-        self.played = True
-
     def end_match(self):
-        self.set_match_as_played()
+        self._set_match_as_played()
         points_home, points_away = self._get_points_after_match()
         self.club_home.set_points(points_home)
         self.club_away.set_points(points_away)
+
+    def _set_match_as_played(self):
+        self.played = True
 
     def _get_points_after_match(self):
         shape_home = self.club_home.get_shape()

@@ -1,11 +1,9 @@
 import sqlite3
 import tempfile
 
-from src.settings import TESTING
 
-
-def create_connect():
-    if TESTING:
+def create_connect(testing):
+    if testing:
         return _create_temp_db()
     return _create_prod_db()
 
