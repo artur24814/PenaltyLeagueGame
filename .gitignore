@@ -161,4 +161,6 @@ cython_debug/
 
 test.py
 
-database.db
+db.db
+
+.vscode

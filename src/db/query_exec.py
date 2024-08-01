@@ -1,5 +1,4 @@
 from src.db.setup import create_connect
-from src.settings import TESTING
 
 
 class QueryExecutor:
@@ -13,8 +12,8 @@ class QueryExecutor:
         self.class_name = class_name_of_new_obj
         self.fields_to_lookup = db_fields_to_lookup
 
-    def execute(self, *args, **kwargs):
-        self.cursor, self.cnx = create_connect(testing=TESTING)
+    def execute(self, testing=False, *args, **kwargs):
+        self.cursor, self.cnx = create_connect(testing=testing)
         self.cursor.execute(self.sql, tuple(self.values))
         result = True
 

@@ -92,7 +92,7 @@ class Model(metaclass=ModelMeta):
     def delete(self, *args, **kwargs):
         self.manager.sql = f"DELETE FROM {self.manager.get_table_name()} WHERE _id={self._id}"
         self.manager.values = []
-        return QueryExecutor(self.manager.sql, self.manager.values)
+        return QueryExecutor(self.manager.sql, self.manager.values, return_id=True)
 
     def get_init_sql(self):
         fields_sql = ''

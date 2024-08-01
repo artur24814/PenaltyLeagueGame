@@ -25,17 +25,17 @@ def get_teams():
     return teams
 
 
-def get_or_create_teams():
+def get_or_create_teams(testing=False):
     team_config = get_teams_config()
     validate_team_config(team_config)
 
     teams = []
-    result = FootballClub.manager.all().execute()
+    result = FootballClub.manager.all().execute(testing)
 
     if result == []:
         for team_name, values in team_config.items():
             new_team = FootballClub(team_name, values.get('potential'), values.get('logo'))
-            new_team._id = new_team.create().execute()
+            new_team._id = new_team.create().execute(testing)
             teams.append(new_team)
     else:
         teams = [team for team in result]

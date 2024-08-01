@@ -1,5 +1,4 @@
 import sqlite3
-import tempfile
 
 
 def create_connect(testing):
@@ -9,15 +8,12 @@ def create_connect(testing):
 
 
 def _create_prod_db():
-    cnx = sqlite3.connect('database.db')
+    cnx = sqlite3.connect('db.db')
     cursor = cnx.cursor()
     return cursor, cnx
 
 
 def _create_temp_db():
-    _, db_path = tempfile.mkstemp()
-    cnx = sqlite3.connect(db_path)
+    cnx = sqlite3.connect('test-db.db')
     cursor = cnx.cursor()
-    # cursor.execute(CREATE_TABLE)
-    cnx.commit()
-    return cnx, cursor
+    return cursor, cnx

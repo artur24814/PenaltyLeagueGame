@@ -1,14 +1,46 @@
 import pytest
+import os
 
-from src.setup import get_teams
+from src.setup import get_teams, get_or_create_teams
+from src.db.db_init import run_init_queryes, BASE_DIR
 from src.factories.season_factory import SeasonFactory
 from src.models.orm_fields import IntergerField, RealField, TextField
+
 from .testing_models import TestModel
+
+
+@pytest.fixture(autouse=True)
+def setup_test_env():
+    from src.settings import set_testing_mode
+    set_testing_mode(True)
+    return True
+
+
+@pytest.fixture(scope="session", autouse=True)
+def session_teardown():
+    yield
+    temp_file = os.path.join(BASE_DIR.parent, 'test-db.db')
+    if os.path.exists(temp_file):
+        os.remove(temp_file)
+
+
+@pytest.fixture
+def testing_database():
+    from src.settings import TESTING
+    print(TESTING)
+    file_path = os.path.join(BASE_DIR, 'models', 'game_models.py')
+    run_init_queryes(file_path, TESTING)
+    return
 
 
 @pytest.fixture
 def teams():
     return get_teams()
+
+
+@pytest.fixture
+def teams_objs():
+    return get_or_create_teams(testing=True)
 
 
 @pytest.fixture
