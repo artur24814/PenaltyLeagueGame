@@ -1,10 +1,11 @@
 import pytest
 import os
 
-from src.setup import get_teams, get_or_create_teams
+from src.setup import get_teams_config, get_or_create_teams
 from src.db.db_init import run_init_queryes, BASE_DIR
 from src.factories.season_factory import SeasonFactory
 from src.models.orm_fields import IntergerField, RealField, TextField
+from src.models.game_models import FootballClub
 
 from .testing_models import TestModel
 
@@ -35,7 +36,18 @@ def testing_database():
 
 @pytest.fixture
 def teams():
-    return get_teams()
+    team_config = get_teams_config()
+
+    teams = []
+
+    id_indx = 1
+    for team_name, values in team_config.items():
+        new_club = FootballClub(team_name, values.get('potential'), values.get('logo'))
+        new_club.id = id_indx
+        id_indx += 1
+        teams.append(new_club)
+
+    return teams
 
 
 @pytest.fixture

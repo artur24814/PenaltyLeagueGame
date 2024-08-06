@@ -12,16 +12,16 @@ class SeasonFactory:
         self.season_legs = []
 
     def get_new_season(self):
-        half_seasons_matches_generator = self._generator_match_weeks_for_half_season()
-        all_seasons_week_matches = self._convert_from_half_season_weeks_into_all_season_weeks(half_seasons_matches_generator)
+        half_seasons_matches_generator = self._list_of_unique_match_pair_tuples()
+        all_seasons_week_matches = self._convert_from_match_weeks_tuples_into_match_weeks_objs(half_seasons_matches_generator)
         return Season(match_weeks=all_seasons_week_matches)
 
-    def _generator_match_weeks_for_half_season(self):
+    def _list_of_unique_match_pair_tuples(self):
         """
         Creating an unique collections of list of pair items from a list.
         """
         legs_counter = 1
-        half_season_legs = []
+        list_of_match_tuples = []
 
         while legs_counter <= self.match_weeks_amount_half_season:
             one_leg = []
@@ -30,11 +30,11 @@ class SeasonFactory:
             randomed_list = self.teams.copy()
 
             while self._is_number_of_matches_in_leg_less_than_half_of_teams_on_list_and_still_teams_left(one_leg, randomed_list):
-                # create pair
+                # create teams pair
                 match = (randomed_list[0], randomed_list[1])
 
                 if self._is_this_match_not_already_in_the_leg_and_it_is_not_last_two_teams(match, one_leg, randomed_list):
-                    if not self._is_match_already_exist(match, half_season_legs):
+                    if not self._is_match_already_exist(match, list_of_match_tuples):
                         one_leg.append(match)
                         del randomed_list[0:2]
 
@@ -43,10 +43,10 @@ class SeasonFactory:
                     one_leg.append((randomed_list.pop(), randomed_list.pop()))
                 random.shuffle(randomed_list)
 
-            half_season_legs.append(one_leg)
+            list_of_match_tuples.append(one_leg)
             legs_counter += 1
 
-        return half_season_legs
+        return list_of_match_tuples
 
     def _is_number_of_matches_in_leg_less_than_half_of_teams_on_list_and_still_teams_left(self, leg, randomed_list):
         return len(leg) <= (len(self.teams) / 2) and len(randomed_list) >= 2
@@ -60,12 +60,9 @@ class SeasonFactory:
                 return True
         return False
 
-    def _convert_from_half_season_weeks_into_all_season_weeks(self, half_season_legs):
-        for index, legs in enumerate(half_season_legs, start=1):
-            # first half season
+    def _convert_from_match_weeks_tuples_into_match_weeks_objs(self, list_of_match_tuples):
+        for index, legs in enumerate(list_of_match_tuples, start=1):
             self.season_legs.append(self._create_match_week_objects(legs, index))
-            # second half season
-            # self.season_legs.append(self._create_match_week_objects(legs, self.match_weeks_amount_half_season + index, reverse=True))
         return self.season_legs
 
     def _create_match_week_objects(self, leg_list, legs_counter, reverse=False):

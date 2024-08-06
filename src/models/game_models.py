@@ -94,7 +94,7 @@ class Season(Model):
 
     @property
     def get_match_weeks(self):
-        return MatchWeek.manager.filter(season_id=self._id).execute()
+        return MatchWeek.query_creator.filter(season_id=self._id).execute()
 
     def __iter__(self):
         return self
@@ -134,7 +134,7 @@ class MatchWeek(Model):
 
     @property
     def get_matches(self):
-        return Match.manager.filter(match_week_id=self._id).execute()
+        return Match.query_creator.filter(match_week_id=self._id).execute()
 
     def __iter__(self):
         return self
@@ -161,13 +161,13 @@ class Match(Model):
     @property
     def get_club_home(self):
         if isinstance(self.club_home, int):
-            return FootballClub.manager.get_one(_id=self.club_home).execute()
+            return FootballClub.query_creator.get_one(_id=self.club_home).execute()
         return self.club_home
 
     @property
     def get_club_away(self):
         if isinstance(self.club_away, int):
-            return FootballClub.manager.get_one(_id=self.club_away).execute()
+            return FootballClub.query_creator.get_one(_id=self.club_away).execute()
         return self.club_away
 
     def create(self, *args, **kwargs):
