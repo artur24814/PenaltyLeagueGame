@@ -102,6 +102,8 @@ class Model(metaclass=ModelMeta):
             value = getattr(self, field)
             if isinstance(value, int):
                 fields_sql += IntergerField(name=field, null=False).get_sql() + ', '
+            elif isinstance(value, bool):
+                fields_sql += IntergerField(name=field, null=False).get_sql() + ', '
             elif isinstance(value, float):
                 fields_sql += RealField(name=field, null=False).get_sql() + ', '
             else:

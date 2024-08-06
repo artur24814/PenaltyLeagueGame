@@ -83,15 +83,18 @@ class FootballClub(Model):
         return hash((self.title, ))
 
 
-class Season:
-    def __init__(self, match_weeks):
-        self._id = -1
+class Season(Model):
+    db_fields_to_lookup = ['_id', 'end']
+
+    def __init__(self, match_weeks=None, end=False):
+        super().__init__()
         self.match_weeks = match_weeks
+        self.end = end
         self.index = 0
 
     @property
-    def id(self):
-        return self._id
+    def get_match_weeks(self):
+        return MatchWeek.manager.filter(season_id=self._id).execute()
 
     def __iter__(self):
         return self
@@ -107,18 +110,31 @@ class Season:
     def __len__(self):
         return len(self.match_weeks)
 
+    def create(self, *args, **kwargs):
+        self._id = super().create(*args, **kwargs).execute()
+        for match_week in self.match_weeks:
+            match_week.season_id = self._id
+            match_week._id = match_week.create().execute()
+            for match in match_week:
+                match.match_week_id = match_week._id
+                match._id = match.create().execute()
+        return self._id
 
-class MatchWeek:
-    def __init__(self, number, end=False):
-        self._id = -1
+
+class MatchWeek(Model):
+    db_fields_to_lookup = ['_id', 'season_id', 'number', 'end']
+
+    def __init__(self, season_id=-1, number=0, end=False):
+        super().__init__()
+        self.season_id = season_id
         self.matches = []
         self.number = number
         self.end = end
         self.index = 0
 
     @property
-    def id(self):
-        return self._id
+    def get_matches(self):
+        return Match.manager.filter(match_week_id=self._id).execute()
 
     def __iter__(self):
         return self
@@ -132,17 +148,33 @@ class MatchWeek:
         return result
 
 
-class Match:
-    def __init__(self, club_home: FootballClub, club_away: FootballClub, week=None, played=False):
-        self._id = -1
+class Match(Model):
+    db_fields_to_lookup = ['_id', 'club_home', 'club_away', 'match_week_id', 'played']
+
+    def __init__(self, club_home=0, club_away=1, match_week_id=-1, played=False):
+        super().__init__()
         self.club_home = club_home
         self.club_away = club_away
-        self.matchWeek = week
+        self.match_week_id = match_week_id
         self.played = played
 
     @property
-    def id(self):
-        return self._id
+    def get_club_home(self):
+        if isinstance(self.club_home, int):
+            return FootballClub.manager.get_one(_id=self.club_home).execute()
+        return self.club_home
+
+    @property
+    def get_club_away(self):
+        if isinstance(self.club_away, int):
+            return FootballClub.manager.get_one(_id=self.club_away).execute()
+        return self.club_away
+
+    def create(self, *args, **kwargs):
+        if not isinstance(self.club_home, int) or not isinstance(self.club_away, int):
+            self.club_home = self.club_home.id
+            self.club_away = self.club_away.id
+        return super().create(*args, **kwargs)
 
     def end_match(self):
         self._set_match_as_played()
