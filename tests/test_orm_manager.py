@@ -23,7 +23,7 @@ def test_all_queryset(test_model):
 
 
 def test_create_queryset(test_model):
-    executor = test_model.create()
+    executor = test_model.save()
 
     assert test_model.query_creator.sql == "INSERT INTO TESTMODEL (name, second, last) VALUES (?,?,?)"
     assert tuple(test_model.query_creator.values) == ('Harry', 'Potter', 2)
@@ -31,7 +31,7 @@ def test_create_queryset(test_model):
 
 
 def test_update_queryset_on_not_set_id(test_model):
-    executor = test_model.update()
+    executor = test_model.save()
 
     assert test_model.query_creator.sql == "INSERT INTO TESTMODEL (name, second, last) VALUES (?,?,?)"
     assert tuple(test_model.query_creator.values) == ('Harry', 'Potter', 2)
@@ -40,7 +40,7 @@ def test_update_queryset_on_not_set_id(test_model):
 
 def test_update_queryset_with_id(test_model):
     test_model._id = 5
-    executor = test_model.update()
+    executor = test_model.save()
 
     assert test_model.query_creator.sql == "UPDATE TESTMODEL SET _id=?, name=?, second=?, last=? WHERE _id=5"
     assert tuple(test_model.query_creator.values) == ()

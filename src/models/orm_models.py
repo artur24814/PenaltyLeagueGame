@@ -72,24 +72,16 @@ class Model(metaclass=ModelMeta):
         values = [getattr(self, attr) for attr in self.db_fields_to_lookup]
         return attrs, values
 
-    def create(self, *args, **kwargs):
-        if self._id != -1:
-            return self.update(self, *args, **kwargs)
-
+    def save(self, *args, **kwargs):
         attrs, values = self.get_attrs_values_tuple()
-        self.query_creator.sql = f'INSERT INTO {self.query_creator.get_table_name()} ({", ".join(attrs[1:])}) VALUES ({str("?," * len(values[1:]))[:-1]})'
-        self.query_creator.values = values[1:]
-        return QueryExecutor(self.query_creator.sql, self.query_creator.values, return_id=True)
-
-    def update(self, *args, **kwargs):
         if self._id == -1:
-            return self.create(self, *args, **kwargs)
+            self.query_creator.sql = f'INSERT INTO {self.query_creator.get_table_name()} ({", ".join(attrs[1:])}) VALUES ({str("?," * len(values[1:]))[:-1]})'
+            self.query_creator.values = values[1:]
+        else:
+            attrs_str = ", ".join([attr + '=?' for attr in attrs])
+            self.query_creator.sql = f"UPDATE {self.query_creator.get_table_name()} SET {attrs_str} WHERE _id={self._id}"
+            self.query_creator.values = []
 
-        attrs, _ = self.get_attrs_values_tuple()
-        attrs_str = ", ".join([attr + '=?' for attr in attrs])
-
-        self.query_creator.sql = f"UPDATE {self.query_creator.get_table_name()} SET {attrs_str} WHERE _id={self._id}"
-        self.query_creator.values = []
         return QueryExecutor(self.query_creator.sql, self.query_creator.values, return_id=True)
 
     def delete(self, *args, **kwargs):

@@ -20,7 +20,7 @@ def get_or_create_teams(testing=False):
     if result == []:
         for team_name, values in team_config.items():
             new_team = FootballClub(team_name, values.get('potential'), values.get('logo'))
-            new_team._id = new_team.create().execute(testing)
+            new_team._id = new_team.save().execute(testing)
             teams.append(new_team)
     else:
         teams = [team for team in result]
@@ -33,7 +33,7 @@ def get_current_season(testing=False):
         return existing_unfinished_season
     factory = SeasonFactory(teams=get_or_create_teams())
     new_season = factory.get_new_season()
-    new_season.create()
+    new_season.save()
     return new_season
 
 

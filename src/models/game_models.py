@@ -110,14 +110,14 @@ class Season(Model):
     def __len__(self):
         return len(self.match_weeks)
 
-    def create(self, *args, **kwargs):
-        self._id = super().create(*args, **kwargs).execute()
+    def save(self, *args, **kwargs):
+        self._id = super().save(*args, **kwargs).execute()
         for match_week in self.match_weeks:
             match_week.season_id = self._id
-            match_week._id = match_week.create().execute()
+            match_week._id = match_week.save().execute()
             for match in match_week:
                 match.match_week_id = match_week._id
-                match._id = match.create().execute()
+                match._id = match.save().execute()
         return self._id
 
 
@@ -170,11 +170,11 @@ class Match(Model):
             return FootballClub.query_creator.get_one(_id=self.club_away).execute()
         return self.club_away
 
-    def create(self, *args, **kwargs):
+    def save(self, *args, **kwargs):
         if not isinstance(self.club_home, int) or not isinstance(self.club_away, int):
             self.club_home = self.club_home.id
             self.club_away = self.club_away.id
-        return super().create(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
     def end_match(self):
         self._set_match_as_played()
