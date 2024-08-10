@@ -1,44 +1,32 @@
 import random
 
+from src.models.orm_models import Model
 
-class FootballClub:
+
+class FootballClub(Model):
     accident_events = [-15, -13, -11, -9, -7, -5, -3, -1, 0, 1, 3, 5, 7, 9, 11, 13, 15]
+    db_fields_to_lookup = ['_id', 'title', 'potential', 'logo', 'points', 'mood', 'games', 'wins', 'draws', 'losses']
 
-    def __init__(self, title, potential, logo=None, points=0, mood=5):
-        self._id = -1
+    def __init__(self, title=None, potential=None, logo=None, points=0, mood=5, games=0, wins=0, draws=0, losses=0):
+        super().__init__()
         self.title = title
         self.potential = potential
         self.logo = logo
         self.points = points
         self.mood = mood
 
-        self.min_mood = 5
-        self.max_mood = 20
-
-        self.games = 0
-        self.wins = 0
-        self.draws = 0
-        self.losses = 0
-
-    def __str__(self) -> str:
-        return f'{self.title} - {self.potential}'
-
-    def __eq__(self, other):
-        return self.title == other.title
-
-    def __ne__(self, other):
-        return self.title != other.title
-
-    def __hash__(self):
-        return hash((self.title, ))
+        self.games = games
+        self.wins = wins
+        self.draws = draws
+        self.losses = losses
 
     @property
-    def id(self):
-        return self._id
+    def min_mood(self):
+        return 5
 
-    @id.setter
-    def id(self, value):
-        self._id = value
+    @property
+    def max_mood(self):
+        return 20
 
     def get_shape(self):
         return self.potential + self.mood + random.choice(self.accident_events)
@@ -53,11 +41,12 @@ class FootballClub:
 
     def _set_stats(self, points):
         if points == 3:
-            self.win += 1
+            self.wins += 1
         elif points == 0:
-            self.lose += 1
+            self.losses += 1
         else:
-            self.draw += 1
+            self.draws += 1
+        return
 
     def _set_mood(self, value):
         if self._is_between_normal_mood():
@@ -81,16 +70,31 @@ class FootballClub:
     def _is_above_normal_mood_but_the_match_result_negative(self, value):
         return self.mood >= self.max_mood and value < 0
 
+    def __str__(self) -> str:
+        return f'{self.title} - {self.potential}'
 
-class Season:
-    def __init__(self, match_weeks):
-        self._id = -1
+    def __eq__(self, other):
+        return self.title == other.title
+
+    def __ne__(self, other):
+        return self.title != other.title
+
+    def __hash__(self):
+        return hash((self.title, ))
+
+
+class Season(Model):
+    db_fields_to_lookup = ['_id', 'end']
+
+    def __init__(self, match_weeks=None, end=False):
+        super().__init__()
         self.match_weeks = match_weeks
+        self.end = end
         self.index = 0
 
     @property
-    def id(self):
-        return self._id
+    def get_match_weeks(self):
+        return MatchWeek.query_creator.filter(season_id=self._id).execute()
 
     def __iter__(self):
         return self
@@ -106,18 +110,31 @@ class Season:
     def __len__(self):
         return len(self.match_weeks)
 
+    def save(self, *args, **kwargs):
+        self._id = super().save(*args, **kwargs).execute()
+        for match_week in self.match_weeks:
+            match_week.season_id = self._id
+            match_week._id = match_week.save().execute()
+            for match in match_week:
+                match.match_week_id = match_week._id
+                match._id = match.save().execute()
+        return self._id
 
-class MatchWeek:
-    def __init__(self, number, end=False):
-        self._id = -1
+
+class MatchWeek(Model):
+    db_fields_to_lookup = ['_id', 'season_id', 'number', 'end']
+
+    def __init__(self, season_id=-1, number=0, end=False):
+        super().__init__()
+        self.season_id = season_id
         self.matches = []
         self.number = number
         self.end = end
         self.index = 0
 
     @property
-    def id(self):
-        return self._id
+    def get_matches(self):
+        return Match.query_creator.filter(match_week_id=self._id).execute()
 
     def __iter__(self):
         return self
@@ -131,13 +148,47 @@ class MatchWeek:
         return result
 
 
-class Match:
-    def __init__(self, club_home: FootballClub, club_away: FootballClub, week=None, played=False):
-        self._id = -1
+class Match(Model):
+    db_fields_to_lookup = ['_id', 'club_home', 'club_away', 'match_week_id', 'played']
+
+    def __init__(self, club_home=0, club_away=1, match_week_id=-1, played=False):
+        super().__init__()
         self.club_home = club_home
         self.club_away = club_away
-        self.matchWeek = week
+        self.match_week_id = match_week_id
         self.played = played
+
+    @property
+    def get_club_home(self):
+        if isinstance(self.club_home, int):
+            return FootballClub.query_creator.get_one(_id=self.club_home).execute()
+        return self.club_home
+
+    @property
+    def get_club_away(self):
+        if isinstance(self.club_away, int):
+            return FootballClub.query_creator.get_one(_id=self.club_away).execute()
+        return self.club_away
+
+    def save(self, *args, **kwargs):
+        if not isinstance(self.club_home, int) or not isinstance(self.club_away, int):
+            self.club_home = self.club_home.id
+            self.club_away = self.club_away.id
+        return super().save(*args, **kwargs)
+
+    def end_match(self):
+        self._set_match_as_played()
+        points_home, points_away = self._get_points_after_match()
+        self.club_home.set_points(points_home)
+        self.club_away.set_points(points_away)
+
+    def _set_match_as_played(self):
+        self.played = True
+
+    def _get_points_after_match(self):
+        shape_home = self.club_home.get_shape()
+        shape_away = self.club_away.get_shape()
+        return 3, 0 if shape_home > shape_away else (0, 3 if shape_home > shape_away else 1, 1)
 
     def __str__(self) -> str:
         return f'{self.club_home} vs. {self.club_away}'
@@ -147,21 +198,3 @@ class Match:
 
     def __ne__(self, other):
         return self.club_home != other.club_home or self.club_away != other.club_away
-
-    @property
-    def id(self):
-        return self._id
-
-    def set_match_as_played(self):
-        self.played = True
-
-    def end_match(self):
-        self.set_match_as_played()
-        points_home, points_away = self._get_points_after_match()
-        self.club_home.set_points(points_home)
-        self.club_away.set_points(points_away)
-
-    def _get_points_after_match(self):
-        shape_home = self.club_home.get_shape()
-        shape_away = self.club_away.get_shape()
-        return 3, 0 if shape_home > shape_away else (0, 3 if shape_home > shape_away else 1, 1)

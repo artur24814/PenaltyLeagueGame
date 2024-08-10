@@ -1,5 +1,5 @@
 class BaseField:
-    def __init__(self, name=None, null=True, primary=True):
+    def __init__(self, name=None, null=True, primary=False):
         self.name = name
         self.null = null
         self.primary = primary
