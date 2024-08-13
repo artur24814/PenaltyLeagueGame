@@ -80,7 +80,7 @@ class Model(metaclass=ModelMeta):
         else:
             attrs_str = ", ".join([attr + '=?' for attr in attrs])
             self.query_creator.sql = f"UPDATE {self.query_creator.get_table_name()} SET {attrs_str} WHERE _id={self._id}"
-            self.query_creator.values = []
+            self.query_creator.values = values
 
         return QueryExecutor(self.query_creator.sql, self.query_creator.values, return_id=True)
 

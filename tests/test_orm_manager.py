@@ -43,7 +43,7 @@ def test_update_queryset_with_id(test_model):
     executor = test_model.save()
 
     assert test_model.query_creator.sql == "UPDATE TESTMODEL SET _id=?, name=?, second=?, last=? WHERE _id=5"
-    assert tuple(test_model.query_creator.values) == ()
+    assert tuple(test_model.query_creator.values) == (5, 'Harry', 'Potter', 2)
     assert isinstance(executor, QueryExecutor) is True
 
 
