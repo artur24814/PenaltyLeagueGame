@@ -1,8 +1,12 @@
+import os
+
 from src.game_states.abstract import GameState
-from src.ui_components.colors import WHITE, BLACK, GREEN, GRAY
+from src.game_states.penalty_game_page import PenaltyGamePage
+from src.ui_components.colors import BLACK, GREEN, GRAY
 from src.models.game_models import MatchWeek
 from src.ui_components.buttons.base_button import BaseBtn
-from src.settings import WINDOW_HEIGHT, WINDOW_WIDTH
+from src.settings import WINDOW_HEIGHT, WINDOW_WIDTH, BASE_DIR
+from src.services import generate_results_and_save_matches
 
 
 class MatchWeekPage(GameState):
@@ -19,7 +23,7 @@ class MatchWeekPage(GameState):
         return (
             (
                 self.button_next,
-                lambda: print('go to match')
+                lambda: self.game.change_state(PenaltyGamePage(self.game, self.pygame, self.screen, self.matchWeek.id))
             ),
             (
                 self.button_random,
@@ -29,8 +33,7 @@ class MatchWeekPage(GameState):
 
     def play_matches(self):
         self.matchWeek.end = 1
-        [match.end_match() for match in self.matches]
-        [match.save().execute() for match in self.matches]
+        generate_results_and_save_matches(matches=self.matches)
         self.matchWeek.save().execute()
         from src.game_states.season_page import SeasonPage
         self.game.change_state(SeasonPage(self.game, self.pygame, self.screen))
@@ -39,7 +42,9 @@ class MatchWeekPage(GameState):
         pass
 
     def draw(self):
-        self.screen.fill(WHITE)
+        background_image = self.pygame.image.load(os.path.join(BASE_DIR, 'assets', 'img', 'match-weak-background.jpeg'))
+        background_image = self.pygame.transform.scale(background_image, (WINDOW_WIDTH, WINDOW_HEIGHT))
+        self.screen.blit(background_image, (0, 0))
         self.draw_matches()
         self.button_next.draw(
             screen=self.screen,

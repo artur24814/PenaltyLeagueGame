@@ -24,7 +24,7 @@ class WelcomePage(GameState):
         pass
 
     def draw(self):
-        background_image = self.pygame.image.load(os.path.join(BASE_DIR, 'assets', 'img', 'welcome-background.jpg'))
+        background_image = self.pygame.image.load(os.path.join(BASE_DIR, 'assets', 'img', 'welcome-background.jpeg'))
         background_image = self.pygame.transform.scale(background_image, (WINDOW_WIDTH, WINDOW_HEIGHT))
         self.screen.blit(background_image, (0, 0))
         self.button_welcome.draw(screen=self.screen, x=(WINDOW_WIDTH // 2) - self.button_welcome.width // 2, y=WINDOW_HEIGHT // 2)

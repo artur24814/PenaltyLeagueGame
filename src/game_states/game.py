@@ -16,3 +16,5 @@ class Game:
             self.state.handle_events(events)
             self.state.update()
             self.state.draw()
+            if self.state.is_end_state():
+                self.state.run_end_state()

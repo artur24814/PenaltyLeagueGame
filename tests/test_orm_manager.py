@@ -9,7 +9,7 @@ def test_generated_table_name(test_model):
 def test_filter_queryset(test_model):
     executor = test_model.query_creator.filter(name='Harry', second="Potter")
 
-    assert test_model.query_creator.sql == "SELECT * FROM TESTMODEL WHERE name=?, second=?"
+    assert test_model.query_creator.sql == "SELECT * FROM TESTMODEL WHERE name=? AND second=?"
     assert tuple(test_model.query_creator.values) == ("Harry", "Potter")
     assert isinstance(executor, QueryExecutor) is True
 

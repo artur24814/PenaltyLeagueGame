@@ -5,9 +5,9 @@ from src.models.orm_models import Model
 
 class FootballClub(Model):
     accident_events = [-15, -13, -11, -9, -7, -5, -3, -1, 0, 1, 3, 5, 7, 9, 11, 13, 15]
-    db_fields_to_lookup = ['_id', 'title', 'potential', 'logo', 'points', 'mood', 'games', 'wins', 'draws', 'losses']
+    db_fields_to_lookup = ['_id', 'title', 'potential', 'logo', 'points', 'mood', 'games', 'wins', 'draws', 'losses', 'computer']
 
-    def __init__(self, title=None, potential=None, logo=None, points=0, mood=5, games=0, wins=0, draws=0, losses=0):
+    def __init__(self, title=None, potential=None, logo=None, points=0, mood=5, games=0, wins=0, draws=0, losses=0, computer=1):
         super().__init__()
         self.title = title
         self.potential = potential
@@ -19,6 +19,7 @@ class FootballClub(Model):
         self.wins = wins
         self.draws = draws
         self.losses = losses
+        self.computer = computer
 
     @property
     def min_mood(self):
@@ -109,7 +110,7 @@ class Season(Model):
         return result
 
     def __len__(self):
-        return len(self.match_weeks)
+        return len(self.get_match_weeks) if not self.match_weeks else len(self.match_weeks)
 
     def save(self, *args, **kwargs):
         self._id = super().save(*args, **kwargs).execute()
@@ -174,11 +175,12 @@ class Match(Model):
     def save(self, *args, **kwargs):
         club_home_obj = self.get_club_home
         club_away_obj = self.get_club_away
-        print("club_home_obj points: ", club_home_obj.points)
-        print("club_away_obj points: ", club_away_obj.points)
         if not isinstance(self.club_home, int) or not isinstance(self.club_away, int):
             self.club_home = club_home_obj.id
             self.club_away = club_away_obj.id
+
+        if kwargs.get('save_instance', None):
+            return super().save(*args, **kwargs)
         club_home_obj.save().execute()
         club_away_obj.save().execute()
         return super().save(*args, **kwargs)

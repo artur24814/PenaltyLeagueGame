@@ -20,7 +20,8 @@ def get_or_create_teams(testing=False):
 
     if result == []:
         for team_name, values in team_config.items():
-            new_team = FootballClub(team_name, values.get('potential'), values.get('logo'))
+            print(values.get('computer'))
+            new_team = FootballClub(team_name, values.get('potential'), values.get('logo'), computer=values.get('computer'))
             new_team._id = new_team.save().execute(testing)
             teams.append(new_team)
     else:
@@ -30,7 +31,7 @@ def get_or_create_teams(testing=False):
 
 
 def get_current_season(testing=False):
-    if (existing_unfinished_season := Season.query_creator.get_one(end=0)):
+    if (existing_unfinished_season := Season.query_creator.get_one(end=0).execute()):
         return existing_unfinished_season
     factory = SeasonFactory(teams=get_or_create_teams())
     new_season = factory.get_new_season()

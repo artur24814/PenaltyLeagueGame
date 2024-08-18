@@ -17,7 +17,7 @@ class BaseManager:
         return self.model.__class__
 
     def filter(self, **kwargs):
-        attrs_str = ", ".join([attr + '=?' for attr in kwargs.keys()])
+        attrs_str = " AND ".join([attr + '=?' for attr in kwargs.keys()])
         self.sql = f'SELECT * FROM {self.get_table_name()} WHERE {attrs_str}'
         self.values = kwargs.values()
         self.many = True

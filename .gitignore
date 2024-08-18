@@ -164,3 +164,4 @@ test.py
 db.db
 
 .vscode
+ignore_file/
