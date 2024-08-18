@@ -17,7 +17,7 @@ class BaseManager:
         return self.model.__class__
 
     def filter(self, **kwargs):
-        attrs_str = ", ".join([attr + '=?' for attr in kwargs.keys()])
+        attrs_str = " AND ".join([attr + '=?' for attr in kwargs.keys()])
         self.sql = f'SELECT * FROM {self.get_table_name()} WHERE {attrs_str}'
         self.values = kwargs.values()
         self.many = True
@@ -80,7 +80,7 @@ class Model(metaclass=ModelMeta):
         else:
             attrs_str = ", ".join([attr + '=?' for attr in attrs])
             self.query_creator.sql = f"UPDATE {self.query_creator.get_table_name()} SET {attrs_str} WHERE _id={self._id}"
-            self.query_creator.values = []
+            self.query_creator.values = values
 
         return QueryExecutor(self.query_creator.sql, self.query_creator.values, return_id=True)
 

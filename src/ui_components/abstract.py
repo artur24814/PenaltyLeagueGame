@@ -1,0 +1,3 @@
+class Element:
+    def draw(self, screen, x, y):
+        ...

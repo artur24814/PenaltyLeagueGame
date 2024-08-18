@@ -9,7 +9,7 @@ def test_generated_table_name(test_model):
 def test_filter_queryset(test_model):
     executor = test_model.query_creator.filter(name='Harry', second="Potter")
 
-    assert test_model.query_creator.sql == "SELECT * FROM TESTMODEL WHERE name=?, second=?"
+    assert test_model.query_creator.sql == "SELECT * FROM TESTMODEL WHERE name=? AND second=?"
     assert tuple(test_model.query_creator.values) == ("Harry", "Potter")
     assert isinstance(executor, QueryExecutor) is True
 
@@ -43,7 +43,7 @@ def test_update_queryset_with_id(test_model):
     executor = test_model.save()
 
     assert test_model.query_creator.sql == "UPDATE TESTMODEL SET _id=?, name=?, second=?, last=? WHERE _id=5"
-    assert tuple(test_model.query_creator.values) == ()
+    assert tuple(test_model.query_creator.values) == (5, 'Harry', 'Potter', 2)
     assert isinstance(executor, QueryExecutor) is True
 
 

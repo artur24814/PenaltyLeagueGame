@@ -1,34 +1,42 @@
 {
     "arsenal": {
         "logo": "",
-        "potential": 20
+        "potential": 20,
+        "computer": 0
     },
     "Man Sity": {
         "logo": "",
-        "potential": 19
+        "potential": 19,
+        "computer": 1
     },
     "liverpool": {
         "logo": "",
-        "potential": 18
+        "potential": 18,
+        "computer": 1
     },
     "Totenham": {
         "logo": "",
-        "potential": 17
+        "potential": 17,
+        "computer": 1
     },
     "Man Utd": {
         "logo": "",
-        "potential": 16
+        "potential": 16,
+        "computer": 1
     },
     "Aston Villa": {
         "logo": "",
-        "potential": 15
+        "potential": 15,
+        "computer": 1
     },
     "Newcasl": {
         "logo": "",
-        "potential": 14
+        "potential": 14,
+        "computer": 1
     },
     "Chelsea": {
         "logo": "",
-        "potential": 14
+        "potential": 14,
+        "computer": 1
     } 
 }
