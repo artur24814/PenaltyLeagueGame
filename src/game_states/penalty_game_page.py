@@ -5,6 +5,7 @@ from src.settings import WINDOW_HEIGHT, WINDOW_WIDTH
 from src.game_sprites.goal import Goal
 from src.game_sprites.goalkeeper import GoalKeeper
 from src.game_sprites.ball import Ball
+from src.game_sprites.kicker import Kicker
 from src.game_states.penalty_states.defending import DefendingPenaltyState
 from src.game_states.penalty_states.shooting import ShootingPenaltyState
 from src.services import generate_results_and_save_matches
@@ -30,7 +31,15 @@ class PenaltyGamePage(GameState):
         self.end_turn = False
         self.goal = Goal()
         self.goalkeeper = GoalKeeper()
-        self.ball = Ball()
+        self.ball = Ball(start_pos=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 + 200), image_path=['assets', 'img', 'ball'])
+        self.kicker = Kicker(
+            start_pos=(WINDOW_WIDTH // 2 - 250, WINDOW_HEIGHT // 2 + 220),
+            image_path=['assets', 'img', 'kicker'],
+            start_size=(370, 370)
+        )
+        self.all_sprites = self.pygame.sprite.Group()
+        self.all_sprites.add(self.ball)
+        self.all_sprites.add(self.kicker)
 
     def get_current_match(self):
         if (home_match := Match.query_creator.get_one(club_home=self.player_team.id, match_week_id=self.matchWeek.id).execute()):
@@ -70,12 +79,14 @@ class PenaltyGamePage(GameState):
         )
         self.end_turn = True
         if not self.ball.moving and self.current_state.player_choice is not None:
+            self.kicker.animation = True
             self.start_ball_movement()
 
     def start_ball_movement(self):
         actual_selected_zone = self.current_state.player_choice if self.current_state == self.shootingState else self.current_state.oponent_choice
         self.ball.target_position = self.goal.get_target_position_for_zone(actual_selected_zone)
         self.ball.moving = True
+        self.ball.animation = True
 
     def update(self):
         self.mouse_pos = self.pygame.mouse.get_pos()
@@ -84,8 +95,11 @@ class PenaltyGamePage(GameState):
 
         self.current_state.update_player_choice(self.goal.get_zone_for_point(self.arrow_end))
 
-        if self.ball.moving:
-            self.ball.update_position()
+        if self.kicker.animation:
+            self.kicker.update()
+
+        if self.ball.moving and not self.kicker.animation:
+            self.ball.update()
 
     def draw(self):
         self.draw_base()
@@ -96,7 +110,7 @@ class PenaltyGamePage(GameState):
         self.draw_background_image(path_dir_list=['assets', 'img', 'soccer_goal_bg.jpg'])
         self.goal.draw_goal_zones(self.pygame, self.screen, selected_zone=self.current_state.player_choice)
         self.current_state.draw(self.pygame, self.screen, self.arrow_end)
-        self.ball.draw(self.pygame, self.screen)
+        self.all_sprites.draw(self.screen)
         self.draw_status()
 
         self.goalkeeper.draw(
@@ -122,7 +136,9 @@ class PenaltyGamePage(GameState):
 
     def draw_after_end_turn(self):
         self.pygame.time.wait(1000)
-        self.ball.ball_position = self.ball.start_pos
+        self.ball.rect.center = self.ball.start_pos
+        self.ball.size = self.ball.start_size
+        self.ball.image = self.pygame.transform.scale(self.ball.image, self.ball.size)
         self.end_turn = False
         self.set_next_state()
         self.goalkeeper.draw(self.pygame, self.screen, *self.goal.get_target_position_for_zone(1))
