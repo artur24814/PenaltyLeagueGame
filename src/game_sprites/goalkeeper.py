@@ -16,18 +16,6 @@ class GoalKeeper(GameSprite):
     def _get_rect(self):
         return self.image.get_rect(center=self.current_position)
 
-    def update(self):
-        self.update_position()
-        if self.animation:
-            self.image_index += self.animation_speed
-
-            if self.image_index >= len(self.sprite_images):
-                self.end_animate_sequence()
-
-            self.image = self.sprite_images[int(self.image_index)]
-            self.size = self.size[0] - self.zoom_step,  self.size[1] - self.zoom_step
-            self.image = self._transform_scale(int(self.size[0]), self.size[1])
-
     def end_animate_sequence(self):
         self.image_index = len(self.sprite_images) - 1
 
