@@ -1,75 +1,63 @@
-import random
-
 from src.models.game_models import MatchWeek, Match, Season
 
 
 class SeasonFactory:
     def __init__(self, teams):
         self.teams = teams
-        self.match_weeks_amount_half_season = (len(self.teams) - 1) * 2
-        self.match_weeks_amount_season = self.match_weeks_amount_half_season * 2
-
-        self.season_legs = []
+        self.rounds_in_half_season = len(self.teams) - 1
+        self.total_rounds = self.rounds_in_half_season * 2
+        self.match_weeks = []
 
     def get_new_season(self):
-        half_seasons_matches_generator = self._list_of_unique_match_pair_tuples()
-        all_seasons_week_matches = self._convert_from_match_weeks_tuples_into_match_weeks_objs(half_seasons_matches_generator)
-        return Season(match_weeks=all_seasons_week_matches)
+        round_robin_schedule = self._generate_round_robin_schedule()
+        full_season_matches = self._create_full_season_schedule(round_robin_schedule)
+        return Season(match_weeks=full_season_matches)
 
-    def _list_of_unique_match_pair_tuples(self):
+    def _generate_round_robin_schedule(self):
         """
-        Creating an unique collections of list of pair items from a list.
+        Generate a round-robin schedule where each team plays with every other team once.
         """
-        legs_counter = 1
-        list_of_match_tuples = []
+        teams = self._ensure_even_number_of_teams()
+        schedule = []
 
-        while legs_counter <= self.match_weeks_amount_half_season:
-            one_leg = []
-            random.shuffle(self.teams)
+        for _ in range(1, self.rounds_in_half_season + 1):
+            current_round_matches = self._generate_matches_for_round(teams)
+            schedule.append(current_round_matches)
+            teams = self._rotate_teams(teams)
 
-            randomed_list = self.teams.copy()
+        return schedule
 
-            while self._is_number_of_matches_in_leg_less_than_half_of_teams_on_list_and_still_teams_left(one_leg, randomed_list):
-                # create teams pair
-                match = (randomed_list[0], randomed_list[1])
+    def _ensure_even_number_of_teams(self):
+        return self.teams
 
-                if self._is_this_match_not_already_in_the_leg_and_it_is_not_last_two_teams(match, one_leg, randomed_list):
-                    if not self._is_match_already_exist(match, list_of_match_tuples):
-                        one_leg.append(match)
-                        del randomed_list[0:2]
+    def _generate_matches_for_round(self, teams):
+        return [
+            (teams[i], teams[-i - 1])
+            for i in range(len(teams) // 2)
+            if teams[i] is not None and teams[-i - 1] is not None
+        ]
 
-                # if only 2 items left in the list
-                if len(randomed_list) == 2:
-                    one_leg.append((randomed_list.pop(), randomed_list.pop()))
-                random.shuffle(randomed_list)
+    def _rotate_teams(self, teams):
+        return [teams[0]] + [teams[-1]] + teams[1:-1]
 
-            list_of_match_tuples.append(one_leg)
-            legs_counter += 1
+    def _create_full_season_schedule(self, round_robin_schedule):
+        self.match_weeks = []
 
-        return list_of_match_tuples
+        # First half of the season (normal order)
+        for round_number, matches in enumerate(round_robin_schedule, start=1):
+            self.match_weeks.append(self._create_match_week(matches, round_number))
 
-    def _is_number_of_matches_in_leg_less_than_half_of_teams_on_list_and_still_teams_left(self, leg, randomed_list):
-        return len(leg) <= (len(self.teams) / 2) and len(randomed_list) >= 2
+        # Second half of the season (reversed order)
+        for round_number, matches in enumerate(round_robin_schedule, start=self.rounds_in_half_season + 1):
+            self.match_weeks.append(self._create_match_week(matches, round_number, reverse=True))
 
-    def _is_this_match_not_already_in_the_leg_and_it_is_not_last_two_teams(self, match, leg, randomed_list):
-        return match not in leg and len(randomed_list) != 2
+        return self.match_weeks
 
-    def _is_match_already_exist(self, match, temp_season_legs):
-        for elements in temp_season_legs:
-            if match in elements:
-                return True
-        return False
-
-    def _convert_from_match_weeks_tuples_into_match_weeks_objs(self, list_of_match_tuples):
-        for index, legs in enumerate(list_of_match_tuples, start=1):
-            self.season_legs.append(self._create_match_week_objects(legs, index))
-        return self.season_legs
-
-    def _create_match_week_objects(self, leg_list, legs_counter, reverse=False):
-        match_week = MatchWeek(number=legs_counter)
-        for match_tuple in leg_list:
-            match_obj = Match(club_home=match_tuple[0], club_away=match_tuple[1]) if not reverse \
-                else Match(club_home=match_tuple[1], club_away=match_tuple[0])
-            match_week.matches.append(match_obj)
+    def _create_match_week(self, matches, round_number, reverse=False):
+        match_week = MatchWeek(number=round_number)
+        for home, away in matches:
+            if reverse:
+                home, away = away, home
+            match_week.matches.append(Match(club_home=home, club_away=away))
 
         return match_week

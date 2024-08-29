@@ -2,7 +2,7 @@ from .abstract import GameSprite
 
 
 class Kicker(GameSprite):
-    animation_speed = 0.15
+    animation_speed = 0.2
     start_size = (370, 370)
 
     def _get_rect(self):

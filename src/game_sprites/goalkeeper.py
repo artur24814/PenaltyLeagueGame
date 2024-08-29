@@ -5,6 +5,8 @@ from src.settings import BASE_DIR, WINDOW_HEIGHT, WINDOW_WIDTH
 
 
 class GoalKeeper(GameSprite):
+    animation_speed = 0.2
+
     def __init__(self,
                  start_pos=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 - 50),
                  image_path=['assets', 'img', 'goalkeeper', '1'],

@@ -118,7 +118,7 @@ class PenaltyGamePage(GameState):
             self.draw_after_end_turn()
 
     def draw_base(self):
-        self.draw_background_image(path_dir_list=['assets', 'img', 'soccer_goal_bg.jpg'])
+        self.draw_background_image(path_dir_list=['assets', 'img', 'fans_bg.png'], size=(WINDOW_WIDTH, WINDOW_HEIGHT - 210))
         self.goal_sequences.draw_goal_zones(self.pygame, self.screen, selected_zone=self.current_state.player_choice)
         self.all_sprites.draw(self.screen)
         self.current_state.draw(self.pygame, self.screen, self.arrow_end)
@@ -130,12 +130,12 @@ class PenaltyGamePage(GameState):
         scores_text_surface = self.font.render(scores_text, True, WHITE)
         current_state_text_surface = self.small_font.render(self.current_state.state_text, True, WHITE)
 
-        self.screen.blit(scores_text_surface, (WINDOW_WIDTH // 2 - 150, 50))
-        self.screen.blit(current_state_text_surface, (WINDOW_WIDTH // 2 - 100, 150))
+        self.screen.blit(scores_text_surface, (WINDOW_WIDTH // 2 - 120, 50))
+        self.screen.blit(current_state_text_surface, (WINDOW_WIDTH // 2 - 30, 100))
 
         if self.end_turn:
             result_text_surface = self.small_font.render(self.current_state.result_message, True, RED)
-            self.screen.blit(result_text_surface, (WINDOW_WIDTH // 2 - 100, 250))
+            self.screen.blit(result_text_surface, (WINDOW_WIDTH // 2 - 30, 140))
 
     def draw_after_end_turn(self):
         self.pygame.time.wait(1000)

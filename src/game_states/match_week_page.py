@@ -13,7 +13,7 @@ class MatchWeekPage(GameState):
     def __init__(self, game, pygame, screen):
         super().__init__(game, pygame, screen)
         self.font = self.pygame.font.Font(None, 36)
-        self.small_font = self.pygame.font.Font(None, 28)
+        self.small_font = self.pygame.font.Font(None, 25)
         self.matchWeek = MatchWeek.query_creator.filter(end=False).execute()[0]
         self.matches = self.matchWeek.get_matches
         self.button_next = BaseBtn(width=300, height=50, font=self.font, text="Go to match ->")
@@ -59,14 +59,14 @@ class MatchWeekPage(GameState):
         self.pygame.display.flip()
 
     def draw_matches(self):
-        start_y = 100
-        spacing_y = 50
+        start_y = 60
+        spacing_y = 30
         circle_radius = 10
 
         for match in self.matches:
             circle_color = GREEN if match.played else GRAY
-            self.pygame.draw.circle(self.screen, circle_color, (50, start_y + circle_radius), circle_radius)
+            self.pygame.draw.circle(self.screen, circle_color, (WINDOW_WIDTH // 2 - 120, start_y + circle_radius), circle_radius)
             match_text = f"{match.get_club_home.title} - {match.get_club_away.title}"
             text_surface = self.small_font.render(match_text, True, BLACK)
-            self.screen.blit(text_surface, (70, start_y))
+            self.screen.blit(text_surface, (WINDOW_WIDTH // 2 - 100, start_y))
             start_y += spacing_y
