@@ -2,9 +2,9 @@ from .abstract import GameSprite
 
 
 class Ball(GameSprite):
-    animation_speed = 0.15
-    zoom_step = 0.2
-    speed = 4
+    animation_speed = 0.2
+    zoom_step = 0.3
+    speed = 8
 
     def __init__(self, start_pos, image_path, start_size=(40, 40)):
         super().__init__(start_pos, image_path, start_size)
@@ -18,7 +18,7 @@ class Ball(GameSprite):
 
             dx = target_x - ball_x
             dy = target_y - ball_y
-            dist = (dx**2 + dy**2)**0.5
+            dist = (dx**2 + dy**2)**0.45
 
             if dist < self.speed:
                 self.rect.center = self.target_position

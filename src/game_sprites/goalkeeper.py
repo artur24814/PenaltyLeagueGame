@@ -5,7 +5,7 @@ from src.settings import BASE_DIR, WINDOW_HEIGHT, WINDOW_WIDTH
 
 
 class GoalKeeper(GameSprite):
-    animation_speed = 0.2
+    animation_speed = 0.3
 
     def __init__(self,
                  start_pos=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 - 50),
