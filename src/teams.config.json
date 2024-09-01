@@ -1,42 +1,102 @@
 {
     "arsenal": {
-        "logo": "",
+        "logo": "1.png",
         "potential": 20,
         "computer": 0
     },
     "Man Sity": {
-        "logo": "",
+        "logo": "3.png",
         "potential": 19,
         "computer": 1
     },
     "liverpool": {
-        "logo": "",
+        "logo": "4.png",
         "potential": 18,
         "computer": 1
     },
     "Totenham": {
-        "logo": "",
+        "logo": "5.png",
         "potential": 17,
         "computer": 1
     },
     "Man Utd": {
-        "logo": "",
+        "logo": "8.png",
         "potential": 16,
         "computer": 1
     },
     "Aston Villa": {
-        "logo": "",
+        "logo": "9.png",
         "potential": 15,
         "computer": 1
     },
     "Newcasl": {
-        "logo": "",
+        "logo": "6.png",
         "potential": 14,
         "computer": 1
     },
     "Chelsea": {
-        "logo": "",
+        "logo": "7.png",
         "potential": 14,
+        "computer": 1
+    },
+    "Brighton": {
+        "logo": "2.png",
+        "potential": 13,
+        "computer": 1
+    },
+    "Lester": {
+        "logo": "10.png",
+        "potential": 5,
+        "computer": 1
+    },
+    "Everton": {
+        "logo": "19.png",
+        "potential": 7,
+        "computer": 1
+    },
+    "West Ham": {
+        "logo": "11.png",
+        "potential": 10,
+        "computer": 1
+    },
+    "Istwitch": {
+        "logo": "17.png",
+        "potential": 5,
+        "computer": 1
+    },
+    "Nottinham": {
+        "logo": "20.png",
+        "potential": 8,
+        "computer": 1
+    },
+    "Bretford": {
+        "logo": "13.png",
+        "potential": 10,
+        "computer": 1
+    },
+    "Sounthampton": {
+        "logo": "15.png",
+        "potential": 6,
+        "computer": 1
+    },
+    "Fulham": {
+        "logo": "12.png",
+        "potential": 10,
+        "computer": 1
+    },
+    "Bormout": {
+        "logo": "14.png",
+        "potential": 9,
+        "computer": 1
+    },
+    "Cristal Pal": {
+        "logo": "16.png",
+        "potential": 7,
+        "computer": 1
+    },
+    "Woverhampton": {
+        "logo": "18.png",
+        "potential": 5,
         "computer": 1
     } 
 }

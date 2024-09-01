@@ -41,10 +41,10 @@ class GameState:
     def draw(self):
         raise NotImplementedError
 
-    def draw_background_image(self, path_dir_list):
+    def draw_background_image(self, path_dir_list, pos=(0, 0), size=(WINDOW_WIDTH, WINDOW_HEIGHT)):
         background_image = self.pygame.image.load(os.path.join(BASE_DIR, *path_dir_list))
-        background_image = self.pygame.transform.scale(background_image, (WINDOW_WIDTH, WINDOW_HEIGHT))
-        self.screen.blit(background_image, (0, 0))
+        background_image = self.pygame.transform.scale(background_image, size)
+        self.screen.blit(background_image, pos)
 
     def is_end_state(self):
         return False
