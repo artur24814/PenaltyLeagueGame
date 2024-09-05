@@ -56,16 +56,17 @@ The game uses a custom ORM system to manage and persist game data such as player
 #### Example ORM Usage
 
 ```python
+from dataclasses import dataclass, field
 from src.models.orm_models import Model
 
+
+@dataclass
 class CustomePlayerGameModel(Model):
     db_fields_to_lookup = ['_id', 'name', 'team', 'points']
 
-    def __init__(self, name=None, team=None, points=0):
-        super().__init__()
-        self.name = name
-        self.team = team
-        self.points = points
+    name: str = field()
+    team: str = field()
+    points: int = field(default=0)
 ```
 init new table
 ```bash
@@ -82,6 +83,48 @@ players = CustomePlayerGameModel.query_creator.all().execute()
 for p in players:
     print(p.name, p.team)
 
+```
+#### Create custome DB Query
+
+```python
+from src.db.query_exec import QueryExecutor
+
+custome_query = 'QUERY TO DB'
+values = ('value1', ...)
+custome_db_query = QueryExecutor(
+    custome_query, values,
+    many=True,
+    db_fields_to_lookup=['_id',...],  # if we want to return obj
+    class_name_of_new_obj='CustomePlayerGameModel'.upper(),  # if we want to return obj
+    return_id=False
+)
+
+custome_db_query.execute()
+```
+
+#### Custome ModelManager
+```python
+from dataclasses import dataclass
+from src.models.orm_models import BaseManager
+
+
+# Define a CustomManagerObject if needed
+class CustomManagerObject(BaseManager):
+    
+    def get_all_team_a_players(self):
+        return self.filter(team="Team A")
+
+
+@dataclass
+class CustomePlayerGameModel(Model):
+    ...
+    query_creator = CustomManagerObject()
+
+
+players_team_A = CustomePlayerGameModel.query_creator.get_all_team_a_players().execute()
+
+for p in players_team_A:
+    print(p.name, p.team)
 ```
 
 ## State Design Pattern

@@ -20,7 +20,7 @@ def get_or_create_teams(testing=False):
 
     if result == []:
         for team_name, values in team_config.items():
-            new_team = FootballClub(team_name, values.get('potential'), values.get('logo'), computer=values.get('computer'))
+            new_team = FootballClub(title=team_name, potential=values.get('potential'), logo=values.get('logo'), computer=values.get('computer'))
             new_team._id = new_team.save().execute(testing)
             teams.append(new_team)
     else:
