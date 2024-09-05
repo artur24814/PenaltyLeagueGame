@@ -1,3 +1,5 @@
+from dataclasses import dataclass, field
+
 from .orm_fields import IntergerField, RealField, TextField
 from src.db.query_exec import QueryExecutor
 
@@ -52,12 +54,10 @@ class ModelMeta(type):
         return new_cls
 
 
+@dataclass
 class Model(metaclass=ModelMeta):
     db_fields_to_lookup = ['_id']
-
-    def __init__(self):
-        self._id = -1
-        self.query_creator = BaseManager(self)
+    _id: int = field(default=-1)
 
     @property
     def id(self):
@@ -91,17 +91,17 @@ class Model(metaclass=ModelMeta):
 
     def get_init_sql(self):
         fields_sql = ''
-        for field in self.db_fields_to_lookup:
-            if field == '_id':
+        for db_field in self.db_fields_to_lookup:
+            if db_field == '_id':
                 continue
-            value = getattr(self, field)
+            value = getattr(self, db_field)
             if isinstance(value, int):
-                fields_sql += IntergerField(name=field, null=False).get_sql() + ', '
+                fields_sql += IntergerField(name=db_field, null=False).get_sql() + ', '
             elif isinstance(value, bool):
-                fields_sql += IntergerField(name=field, null=False).get_sql() + ', '
+                fields_sql += IntergerField(name=db_field, null=False).get_sql() + ', '
             elif isinstance(value, float):
-                fields_sql += RealField(name=field, null=False).get_sql() + ', '
+                fields_sql += RealField(name=db_field, null=False).get_sql() + ', '
             else:
-                fields_sql += TextField(name=field).get_sql() + ', '
+                fields_sql += TextField(name=db_field).get_sql() + ', '
 
         return f"CREATE TABLE {self.query_creator.get_table_name()} ( _id INTEGER NOT NULL, " + fields_sql + "PRIMARY KEY (_id))"

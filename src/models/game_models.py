@@ -1,25 +1,25 @@
 import random
+from typing import Optional
+from dataclasses import dataclass, field
 
 from src.models.orm_models import Model
 
 
+@dataclass
 class FootballClub(Model):
     accident_events = [-15, -13, -11, -9, -7, -5, -3, -1, 0, 1, 3, 5, 7, 9, 11, 13, 15]
     db_fields_to_lookup = ['_id', 'title', 'potential', 'logo', 'points', 'mood', 'games', 'wins', 'draws', 'losses', 'computer']
+    title: Optional[str] = field(default=None)
+    potential: Optional[int] = field(default=None)
+    logo: Optional[str] = field(default=None)
+    points: int = field(default=0)
+    mood: int = field(default=5)
 
-    def __init__(self, title=None, potential=None, logo=None, points=0, mood=5, games=0, wins=0, draws=0, losses=0, computer=1):
-        super().__init__()
-        self.title = title
-        self.potential = potential
-        self.logo = logo
-        self.points = points
-        self.mood = mood
-
-        self.games = games
-        self.wins = wins
-        self.draws = draws
-        self.losses = losses
-        self.computer = computer
+    games: int = field(default=0)
+    wins: int = field(default=0)
+    draws: int = field(default=0)
+    losses: int = field(default=0)
+    computer: int = field(default=1)
 
     @property
     def min_mood(self):
@@ -85,14 +85,12 @@ class FootballClub(Model):
         return hash((self.title, ))
 
 
+@dataclass
 class Season(Model):
     db_fields_to_lookup = ['_id', 'end']
-
-    def __init__(self, match_weeks=None, end=False):
-        super().__init__()
-        self.match_weeks = match_weeks
-        self.end = end
-        self.index = 0
+    match_weeks: Optional[list] = field(default=None)
+    end: bool = field(default=False)
+    index: int = field(default=0)
 
     @property
     def get_match_weeks(self):
@@ -123,16 +121,15 @@ class Season(Model):
         return self._id
 
 
+@dataclass
 class MatchWeek(Model):
     db_fields_to_lookup = ['_id', 'season_id', 'number', 'end']
 
-    def __init__(self, season_id=-1, number=0, end=False):
-        super().__init__()
-        self.season_id = season_id
-        self.matches = []
-        self.number = number
-        self.end = end
-        self.index = 0
+    season_id: int = field(default=-1)
+    matches: list = field(default_factory=list)
+    number: int = field(default=0)
+    end: bool = field(default=False)
+    index: int = field(default=0)
 
     @property
     def get_matches(self):
@@ -150,15 +147,14 @@ class MatchWeek(Model):
         return result
 
 
+@dataclass
 class Match(Model):
     db_fields_to_lookup = ['_id', 'club_home', 'club_away', 'match_week_id', 'played']
 
-    def __init__(self, club_home=0, club_away=1, match_week_id=-1, played=False):
-        super().__init__()
-        self.club_home = club_home
-        self.club_away = club_away
-        self.match_week_id = match_week_id
-        self.played = played
+    club_home: int = field(default=0)
+    club_away: int = field(default=1)
+    match_week_id: int = field(default=-1)
+    played: bool = field(default=False)
 
     @property
     def get_club_home(self):

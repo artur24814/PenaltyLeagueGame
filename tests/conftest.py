@@ -42,7 +42,7 @@ def teams():
 
     id_indx = 1
     for team_name, values in team_config.items():
-        new_club = FootballClub(team_name, values.get('potential'), values.get('logo'))
+        new_club = FootballClub(title=team_name, potential=values.get('potential'), logo=values.get('logo'))
         new_club.id = id_indx
         id_indx += 1
         teams.append(new_club)
